@@ -1,0 +1,32 @@
+# Node
+node_modules/
+dist/
+coverage/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Vite
+.vite/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Editors
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+*.egg-info/

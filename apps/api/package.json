@@ -1,0 +1,20 @@
+{
+  "name": "@apexfinance/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "test": "vitest run src",
+    "test:watch": "vitest",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@apexfinance/contracts": "^0.1.0",
+    "@fastify/cors": "^11.3.0",
+    "fastify": "^5.12.4",
+    "zod": "^4.6.5"
+  }
+}

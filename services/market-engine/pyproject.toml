@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apexfinance-market-engine"
+version = "0.1.0"
+description = "Motor especializado de dados e processamento financeiro do ApexFinance."
+requires-python = ">=3.12,<3.14"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

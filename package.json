@@ -1,0 +1,34 @@
+{
+  "name": "apexfinance",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma privada de gestão financeira, investimentos, factoring e inteligência financeira.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "npm run dev --workspace=@apexfinance/web",
+    "dev:api": "npm run dev --workspace=@apexfinance/api",
+    "build": "npm run build:packages && npm run build:apps",
+    "build:packages": "npm run build --workspace=@apexfinance/contracts && npm run build --workspace=@apexfinance/financial-core && npm run build --workspace=@apexfinance/ui",
+    "build:apps": "npm run build --workspace=@apexfinance/api && npm run build --workspace=@apexfinance/web",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.20.3",
+    "eslint": "^10.10.0",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "vitest": "^5.0.1"
+  }
+}

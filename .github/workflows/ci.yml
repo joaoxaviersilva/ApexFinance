@@ -1,0 +1,61 @@
+name: Validação do ApexFinance
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  node:
+    name: Aplicações TypeScript
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Executar testes
+        run: npm run test
+
+      - name: Verificar código
+        run: npm run lint
+
+      - name: Verificar formatação
+        run: npm run format:check
+
+      - name: Gerar builds
+        run: npm run build
+
+  python:
+    name: Motor financeiro Python
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: services/market-engine
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependências
+        run: python -m pip install -e ".[dev]"
+
+      - name: Executar testes
+        run: python -m pytest
