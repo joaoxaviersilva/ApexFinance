@@ -30,3 +30,4 @@ Thumbs.db
 npm-debug.log*
 
 *.egg-info/
+/apps/api/src/generated/prisma
