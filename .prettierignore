@@ -5,3 +5,7 @@ coverage/
 .vite/
 *.egg-info/
 package-lock.json
+
+.agents/
+.claude/
+.windsurf/

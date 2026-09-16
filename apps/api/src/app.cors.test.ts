@@ -25,9 +25,7 @@ describe('CORS da API', () => {
 
     expect(response.statusCode).toBe(204);
 
-    expect(response.headers['access-control-allow-origin']).toBe(
-      'http://localhost:5173',
-    );
+    expect(response.headers['access-control-allow-origin']).toBe('http://localhost:5173');
 
     expect(response.headers['access-control-allow-credentials']).toBe('true');
   });
