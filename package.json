@@ -16,7 +16,9 @@
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier . --write",
-    "format:check": "prettier . --check"
+    "format:check": "prettier . --check",
+    "admin:reset-password": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/admin-reset-password.ps1",
+    "dev": "docker compose up -d && concurrently -k -n API,WEB \"npm run dev:api\" \"npm run dev:web\""
   },
   "engines": {
     "node": ">=22"
@@ -24,6 +26,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.3",
+    "concurrently": "^10.0.5",
     "eslint": "^10.10.0",
     "prettier": "^3.9.6",
     "prisma": "^7.10.0",

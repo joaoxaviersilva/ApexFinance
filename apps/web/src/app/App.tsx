@@ -1,18 +1,7 @@
-import { AppShell } from '@apexfinance/ui';
+import '../index.css';
+
+import { AppRouter } from './router/AppRouter';
 
 export function App() {
-  return (
-    <AppShell productName="ApexFinance">
-      <section>
-        <p>Gestão financeira privada e inteligente</p>
-
-        <h1>Cockpit de Inteligência Financeira</h1>
-
-        <p>
-          Sua central para investimentos, patrimônio, planejamento financeiro e operações de
-          crédito.
-        </p>
-      </section>
-    </AppShell>
-  );
+  return <AppRouter />;
 }
