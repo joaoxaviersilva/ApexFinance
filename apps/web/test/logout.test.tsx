@@ -67,7 +67,7 @@ describe('Logout do ApexFinance', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /área autenticada/i,
+        name: /dashboard/i,
       }),
     ).toBeInTheDocument();
 

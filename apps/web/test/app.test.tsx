@@ -296,7 +296,7 @@ describe('Autenticação do ApexFinance', () => {
     });
   });
 
-  it('redireciona para a área autenticada depois do login', async () => {
+  it('redireciona para o Dashboard depois do login', async () => {
     authMocks.useSession.mockReturnValue(authenticatedSession());
 
     renderPath('/');
@@ -325,12 +325,12 @@ describe('Autenticação do ApexFinance', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /área autenticada/i,
+        name: /dashboard/i,
       }),
     ).toBeInTheDocument();
   });
 
-  it('redireciona para a área autenticada depois do cadastro', async () => {
+  it('redireciona para o Dashboard depois do cadastro', async () => {
     authMocks.useSession.mockReturnValue(authenticatedSession());
 
     renderPath('/cadastro');
@@ -371,23 +371,23 @@ describe('Autenticação do ApexFinance', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /área autenticada/i,
+        name: /dashboard/i,
       }),
     ).toBeInTheDocument();
   });
 
-  it('permite que uma sessão autenticada acesse a rota protegida', () => {
+  it('permite que uma sessão autenticada acesse o Dashboard', () => {
     authMocks.useSession.mockReturnValue(authenticatedSession());
 
     renderPath('/app');
 
     expect(
       screen.getByRole('heading', {
-        name: /área autenticada/i,
+        name: /dashboard/i,
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText(/bem-vindo, joão xavier/i)).toBeInTheDocument();
+    expect(screen.getByText(/olá, joão xavier/i)).toBeInTheDocument();
   });
 
   it('impede acesso à rota protegida sem sessão', async () => {

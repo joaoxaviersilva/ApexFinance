@@ -1,12 +1,12 @@
+import { AppShell } from '@apexfinance/ui';
 import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 
 import { authClient } from '../../../shared/lib/auth-client';
+import { AppNavigation } from './AppNavigation';
 
-export function SessionPage() {
+export function AppLayout() {
   const navigate = useNavigate();
-
-  const { data: session } = authClient.useSession();
 
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -33,17 +33,19 @@ export function SessionPage() {
   }
 
   return (
-    <main>
-      <h1>Área autenticada</h1>
+    <AppShell
+      sidebar={<AppNavigation />}
+      header={
+        <div>
+          <span>ApexFinance</span>
 
-      <p>
-        Bem-vindo
-        {session?.user.name ? `, ${session.user.name}` : ''}.
-      </p>
-
-      <button type="button" disabled={isSigningOut} onClick={handleSignOut}>
-        {isSigningOut ? 'Saindo...' : 'Sair'}
-      </button>
-    </main>
+          <button type="button" disabled={isSigningOut} onClick={handleSignOut}>
+            {isSigningOut ? 'Saindo...' : 'Sair'}
+          </button>
+        </div>
+      }
+    >
+      <Outlet />
+    </AppShell>
   );
 }
