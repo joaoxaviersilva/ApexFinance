@@ -1,11 +1,6 @@
-import { AppIcon } from './AppIcons';
+import { UserMenu } from './UserMenu';
 
-type AppHeaderProps = {
-  isSigningOut: boolean;
-  onSignOut: () => void;
-};
-
-export function AppHeader({ isSigningOut, onSignOut }: AppHeaderProps) {
+export function AppHeader() {
   return (
     <div className="app-header">
       <div className="app-header__identity">
@@ -20,16 +15,7 @@ export function AppHeader({ isSigningOut, onSignOut }: AppHeaderProps) {
           Ambiente protegido
         </span>
 
-        <button
-          type="button"
-          className="app-header__logout"
-          disabled={isSigningOut}
-          onClick={onSignOut}
-        >
-          <AppIcon name="logout" />
-
-          <span>{isSigningOut ? 'Saindo...' : 'Sair'}</span>
-        </button>
+        <UserMenu />
       </div>
     </div>
   );

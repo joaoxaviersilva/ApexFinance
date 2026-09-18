@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const authMocks = vi.hoisted(() => ({
@@ -14,12 +14,6 @@ vi.mock('../src/shared/lib/auth-client', () => ({
 }));
 
 import { App } from '../src/app/App';
-
-function renderPath(path: string) {
-  window.history.pushState({}, '', path);
-
-  render(<App />);
-}
 
 function authenticatedSession() {
   return {
@@ -43,17 +37,18 @@ function authenticatedSession() {
   };
 }
 
-describe('Logout do ApexFinance', () => {
+function renderApp() {
+  window.history.pushState({}, '', '/app');
+
+  return render(<App />);
+}
+
+describe('Menu do usuário do ApexFinance', () => {
   beforeEach(() => {
     authMocks.signOut.mockReset();
     authMocks.useSession.mockReset();
 
     authMocks.useSession.mockReturnValue(authenticatedSession());
-
-    authMocks.signOut.mockResolvedValue({
-      data: null,
-      error: null,
-    });
   });
 
   afterEach(() => {
@@ -62,14 +57,10 @@ describe('Logout do ApexFinance', () => {
     window.history.pushState({}, '', '/');
   });
 
-  it('encerra a sessão pelo menu do usuário e volta para o login', async () => {
-    renderPath('/app');
+  it('exibe os dados do usuário e abre o menu', () => {
+    renderApp();
 
-    expect(
-      screen.getByRole('heading', {
-        name: /dashboard/i,
-      }),
-    ).toBeInTheDocument();
+    expect(screen.getByText('João Xavier')).toBeInTheDocument();
 
     fireEvent.click(
       screen.getByRole('button', {
@@ -77,18 +68,30 @@ describe('Logout do ApexFinance', () => {
       }),
     );
 
-    fireEvent.click(
+    expect(screen.getByText('joao@example.com')).toBeInTheDocument();
+
+    expect(
       screen.getByRole('button', {
         name: /^sair$/i,
       }),
+    ).toBeInTheDocument();
+  });
+
+  it('fecha o menu ao pressionar Escape', () => {
+    renderApp();
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: /abrir menu do usuário/i,
+      }),
     );
 
-    await waitFor(() => {
-      expect(authMocks.signOut).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('joao@example.com')).toBeInTheDocument();
+
+    fireEvent.keyDown(document, {
+      key: 'Escape',
     });
 
-    await waitFor(() => {
-      expect(window.location.pathname).toBe('/');
-    });
+    expect(screen.queryByText('joao@example.com')).not.toBeInTheDocument();
   });
 });
