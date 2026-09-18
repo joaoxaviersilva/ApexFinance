@@ -4,14 +4,28 @@ import { describe, expect, it } from 'vitest';
 import { AppShell } from '../src/index.js';
 
 describe('AppShell', () => {
-  it('renderiza a identidade do produto e o conteúdo da página', () => {
+  it('renderiza sidebar, header e conteúdo principal em regiões separadas', () => {
     render(
-      <AppShell productName="ApexFinance">
-        <p>Fundação pronta</p>
+      <AppShell
+        sidebar={
+          <nav aria-label="Navegação principal">
+            <span>Navegação</span>
+          </nav>
+        }
+        header={<div>Cabeçalho</div>}
+      >
+        <p>Conteúdo da página</p>
       </AppShell>,
     );
 
-    expect(screen.getByRole('banner')).toHaveTextContent('ApexFinance');
-    expect(screen.getByText('Fundação pronta')).toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', {
+        name: /navegação principal/i,
+      }),
+    ).toHaveTextContent('Navegação');
+
+    expect(screen.getByRole('banner')).toHaveTextContent('Cabeçalho');
+
+    expect(screen.getByRole('main')).toHaveTextContent('Conteúdo da página');
   });
 });

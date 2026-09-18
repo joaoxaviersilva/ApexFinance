@@ -1,17 +1,20 @@
-import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 type AppShellProps = PropsWithChildren<{
-  productName: string;
+  sidebar: ReactNode;
+  header: ReactNode;
 }>;
 
-export function AppShell({ productName, children }: AppShellProps) {
+export function AppShell({ sidebar, header, children }: AppShellProps) {
   return (
-    <div>
-      <header role="banner">
-        <strong>{productName}</strong>
-      </header>
+    <div className="app-shell">
+      <aside className="app-shell__sidebar">{sidebar}</aside>
 
-      <main>{children}</main>
+      <div className="app-shell__content">
+        <header className="app-shell__header">{header}</header>
+
+        <main className="app-shell__main">{children}</main>
+      </div>
     </div>
   );
 }
