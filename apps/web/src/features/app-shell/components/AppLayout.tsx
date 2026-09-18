@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 
 import { authClient } from '../../../shared/lib/auth-client';
-import { AppNavigation } from './AppNavigation';
+
+import '../app-shell.css';
+
+import { AppHeader } from './AppHeader';
+import { AppSidebar } from './AppSidebar';
 
 export function AppLayout() {
   const navigate = useNavigate();
@@ -34,16 +38,8 @@ export function AppLayout() {
 
   return (
     <AppShell
-      sidebar={<AppNavigation />}
-      header={
-        <div>
-          <span>ApexFinance</span>
-
-          <button type="button" disabled={isSigningOut} onClick={handleSignOut}>
-            {isSigningOut ? 'Saindo...' : 'Sair'}
-          </button>
-        </div>
-      }
+      sidebar={<AppSidebar />}
+      header={<AppHeader isSigningOut={isSigningOut} onSignOut={handleSignOut} />}
     >
       <Outlet />
     </AppShell>

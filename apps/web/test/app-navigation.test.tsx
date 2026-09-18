@@ -13,19 +13,21 @@ vi.mock('../src/shared/lib/auth-client', () => ({
 
 import { App } from '../src/app/App';
 
-function authenticatedAdminSession() {
+type Role = 'user' | 'admin';
+
+function authenticatedSession(role: Role = 'admin') {
   return {
     data: {
       user: {
-        id: 'admin-1',
-        name: 'Administrador',
-        email: 'admin@example.com',
-        role: 'admin',
+        id: 'user-1',
+        name: role === 'admin' ? 'Administrador' : 'Usuário Comum',
+        email: role === 'admin' ? 'admin@example.com' : 'user@example.com',
+        role,
       },
 
       session: {
         id: 'session-1',
-        userId: 'admin-1',
+        userId: 'user-1',
       },
     },
 
@@ -44,7 +46,7 @@ function renderPath(path: string) {
 describe('Navegação autenticada do ApexFinance', () => {
   beforeEach(() => {
     authMocks.useSession.mockReset();
-    authMocks.useSession.mockReturnValue(authenticatedAdminSession());
+    authMocks.useSession.mockReturnValue(authenticatedSession());
   });
 
   afterEach(() => {
@@ -102,5 +104,91 @@ describe('Navegação autenticada do ApexFinance', () => {
         name: /dashboard/i,
       }),
     ).toBeInTheDocument();
+  });
+
+  it('exibe os módulos principais na navegação lateral', () => {
+    renderPath('/app');
+
+    const navigation = screen.getByRole('navigation', {
+      name: /navegação principal/i,
+    });
+
+    expect(navigation).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /dashboard/i,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /carteira/i,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /inteligência/i,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /metas/i,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /^fire$/i,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /factoring/i,
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', {
+        name: /copilot/i,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('marca o módulo atual como página ativa', () => {
+    renderPath('/app/goals');
+
+    expect(
+      screen.getByRole('link', {
+        name: /metas/i,
+      }),
+    ).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('exibe Administração na navegação para ADMIN', () => {
+    authMocks.useSession.mockReturnValue(authenticatedSession('admin'));
+
+    renderPath('/app');
+
+    expect(
+      screen.getByRole('link', {
+        name: /administração/i,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('não exibe Administração na navegação para usuário comum', () => {
+    authMocks.useSession.mockReturnValue(authenticatedSession('user'));
+
+    renderPath('/app');
+
+    expect(
+      screen.queryByRole('link', {
+        name: /administração/i,
+      }),
+    ).not.toBeInTheDocument();
   });
 });

@@ -45,6 +45,7 @@ function authenticatedSession() {
         id: 'user-1',
         name: 'João Xavier',
         email: 'joao@example.com',
+        role: 'user',
       },
 
       session: {
@@ -323,11 +324,13 @@ describe('Autenticação do ApexFinance', () => {
       expect(window.location.pathname).toBe('/app');
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: /dashboard/i,
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: /dashboard/i,
+        }),
+      ).toBeInTheDocument();
+    });
   });
 
   it('redireciona para o Dashboard depois do cadastro', async () => {
@@ -369,11 +372,13 @@ describe('Autenticação do ApexFinance', () => {
       expect(window.location.pathname).toBe('/app');
     });
 
-    expect(
-      screen.getByRole('heading', {
-        name: /dashboard/i,
-      }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', {
+          name: /dashboard/i,
+        }),
+      ).toBeInTheDocument();
+    });
   });
 
   it('permite que uma sessão autenticada acesse o Dashboard', () => {
