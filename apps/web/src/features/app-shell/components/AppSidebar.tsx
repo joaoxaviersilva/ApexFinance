@@ -1,8 +1,12 @@
 import { AppNavigation } from './AppNavigation';
 
-export function AppSidebar() {
+type AppSidebarProps = {
+  onNavigate?: () => void;
+};
+
+export function AppSidebar({ onNavigate }: AppSidebarProps) {
   return (
-    <div className="app-sidebar">
+    <div id="app-sidebar-navigation" className="app-sidebar">
       <div className="app-sidebar__brand">
         <span aria-hidden="true" className="app-brand-mark">
           <span className="app-brand-mark__left" />
@@ -16,7 +20,7 @@ export function AppSidebar() {
         </div>
       </div>
 
-      <AppNavigation />
+      <AppNavigation onNavigate={onNavigate} />
 
       <div className="app-sidebar__footer">
         <span className="app-sidebar__status-dot" />

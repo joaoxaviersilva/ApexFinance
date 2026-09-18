@@ -10,6 +10,10 @@ type NavigationItem = {
   end?: boolean;
 };
 
+type AppNavigationProps = {
+  onNavigate?: () => void;
+};
+
 const primaryItems: NavigationItem[] = [
   {
     label: 'Dashboard',
@@ -53,7 +57,7 @@ function navigationClassName(isActive: boolean) {
   return isActive ? 'app-navigation__link app-navigation__link--active' : 'app-navigation__link';
 }
 
-export function AppNavigation() {
+export function AppNavigation({ onNavigate }: AppNavigationProps) {
   const { data: session } = authClient.useSession();
 
   const isAdmin = session?.user.role === 'admin';
@@ -70,6 +74,9 @@ export function AppNavigation() {
               to={item.to}
               end={item.end}
               className={({ isActive }) => navigationClassName(isActive)}
+              onClick={() => {
+                onNavigate?.();
+              }}
             >
               <AppIcon name={item.icon} />
 
@@ -84,7 +91,13 @@ export function AppNavigation() {
           <span className="app-navigation__label">SISTEMA</span>
 
           <div className="app-navigation__links">
-            <NavLink to="/app/admin" className={({ isActive }) => navigationClassName(isActive)}>
+            <NavLink
+              to="/app/admin"
+              className={({ isActive }) => navigationClassName(isActive)}
+              onClick={() => {
+                onNavigate?.();
+              }}
+            >
               <AppIcon name="admin" />
 
               <span>Administração</span>
