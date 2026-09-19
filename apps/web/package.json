@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@apexfinance/contracts": "^0.1.0",
     "@apexfinance/ui": "^0.1.0",
     "better-auth": "^1.7.5",
     "react": "^19.2.8",

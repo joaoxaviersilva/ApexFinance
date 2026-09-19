@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 
 import '../../features/auth/auth.css';
 
+import { AdminPage } from '../../features/admin/pages/AdminPage';
 import { AppLayout } from '../../features/app-shell/components/AppLayout';
 import { ModulePlaceholderPage } from '../../features/app-shell/pages/ModulePlaceholderPage';
 import { RequireAdmin } from '../../features/auth/components/RequireAdmin';
@@ -92,10 +93,7 @@ export function AppRouter() {
             path="admin"
             element={
               <RequireAdmin>
-                <ModulePlaceholderPage
-                  title="Administração"
-                  description="Gerencie usuários e configurações administrativas."
-                />
+                <AdminPage />
               </RequireAdmin>
             }
           />
