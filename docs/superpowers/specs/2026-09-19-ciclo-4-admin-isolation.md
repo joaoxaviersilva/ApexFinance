@@ -118,7 +118,7 @@ role
 banned
 banReason
 banExpires
-````
+```
 
 O Better Auth está configurado com:
 
@@ -194,14 +194,14 @@ interface AdminUser {
 
 Não retornar:
 
-* password;
-* password hash;
-* session token;
-* access token;
-* refresh token;
-* Better Auth secret;
-* provider secret;
-* API key.
+- password;
+- password hash;
+- session token;
+- access token;
+- refresh token;
+- Better Auth secret;
+- provider secret;
+- API key.
 
 ---
 
@@ -263,12 +263,12 @@ ou:
 
 Regras:
 
-* requer ADMIN autenticado;
-* alvo precisa existir;
-* role precisa ser válida;
-* administrador não pode alterar o próprio papel para `user`;
-* nenhuma role diferente de `user` ou `admin` é aceita;
-* atualização deve refletir imediatamente na listagem.
+- requer ADMIN autenticado;
+- alvo precisa existir;
+- role precisa ser válida;
+- administrador não pode alterar o próprio papel para `user`;
+- nenhuma role diferente de `user` ou `admin` é aceita;
+- atualização deve refletir imediatamente na listagem.
 
 Resposta:
 
@@ -309,16 +309,16 @@ Desbloquear:
 
 Regras:
 
-* requer ADMIN;
-* alvo precisa existir;
-* administrador não pode bloquear a própria conta;
-* bloqueio exige motivo não vazio;
-* motivo é armazenado em `banReason`;
-* bloqueio será permanente até desbloqueio manual;
-* `banExpires` permanece `null` na V1;
-* ao bloquear, sessões existentes do usuário devem ser invalidadas;
-* desbloquear limpa o estado de bloqueio;
-* desbloquear não autentica automaticamente o usuário.
+- requer ADMIN;
+- alvo precisa existir;
+- administrador não pode bloquear a própria conta;
+- bloqueio exige motivo não vazio;
+- motivo é armazenado em `banReason`;
+- bloqueio será permanente até desbloqueio manual;
+- `banExpires` permanece `null` na V1;
+- ao bloquear, sessões existentes do usuário devem ser invalidadas;
+- desbloquear limpa o estado de bloqueio;
+- desbloquear não autentica automaticamente o usuário.
 
 ---
 
@@ -326,8 +326,8 @@ Regras:
 
 Usuário bloqueado não deve:
 
-* criar nova sessão normalmente;
-* continuar utilizando uma sessão previamente válida após o bloqueio.
+- criar nova sessão normalmente;
+- continuar utilizando uma sessão previamente válida após o bloqueio.
 
 O backend deve garantir isso.
 
@@ -349,7 +349,7 @@ sobre a própria conta.
 
 Motivo:
 
-* evitar lockout administrativo acidental.
+- evitar lockout administrativo acidental.
 
 ### 13.2 Auto-bloqueio
 
@@ -435,13 +435,13 @@ Não usar números fictícios.
 
 A página deve possuir:
 
-* loading;
-* sucesso;
-* lista vazia;
-* erro;
-* mutação em andamento;
-* feedback de sucesso;
-* feedback de falha.
+- loading;
+- sucesso;
+- lista vazia;
+- erro;
+- mutação em andamento;
+- feedback de sucesso;
+- feedback de falha.
 
 A UI não deve travar a aplicação inteira durante uma mutação individual.
 
@@ -492,8 +492,8 @@ Ações de impacto devem solicitar confirmação antes da mutação.
 
 Obrigatório para:
 
-* rebaixar ADMIN;
-* bloquear usuário.
+- rebaixar ADMIN;
+- bloquear usuário.
 
 Não é necessário modal complexo.
 
@@ -505,13 +505,13 @@ Pode ser utilizada confirmação visual compatível com o design do ApexFinance.
 
 Manter a identidade aprovada no Ciclo 3:
 
-* preto;
-* verde vivo;
-* superfícies translúcidas;
-* bordas discretas;
-* tipografia limpa;
-* sem dashboard administrativo genérico;
-* sem alterações no Login/Cadastro.
+- preto;
+- verde vivo;
+- superfícies translúcidas;
+- bordas discretas;
+- tipografia limpa;
+- sem dashboard administrativo genérico;
+- sem alterações no Login/Cadastro.
 
 A autenticação visual permanece congelada.
 
@@ -521,15 +521,15 @@ A autenticação visual permanece congelada.
 
 Desktop:
 
-* tabela/listagem confortável;
-* sidebar persistente.
+- tabela/listagem confortável;
+- sidebar persistente.
 
 Tablet/mobile:
 
-* conteúdo administrativo não pode gerar scroll horizontal obrigatório;
-* informações podem reorganizar-se em cards/linhas responsivas;
-* ações continuam acessíveis;
-* drawer existente continua funcionando.
+- conteúdo administrativo não pode gerar scroll horizontal obrigatório;
+- informações podem reorganizar-se em cards/linhas responsivas;
+- ações continuam acessíveis;
+- drawer existente continua funcionando.
 
 ---
 
@@ -537,13 +537,13 @@ Tablet/mobile:
 
 Exigir:
 
-* labels acessíveis;
-* botões reais para ações;
-* foco visível;
-* feedback compreensível;
-* estado disabled correto;
-* diálogos/confirmadores navegáveis por teclado;
-* sem depender apenas de cor para status.
+- labels acessíveis;
+- botões reais para ações;
+- foco visível;
+- feedback compreensível;
+- estado disabled correto;
+- diálogos/confirmadores navegáveis por teclado;
+- sem depender apenas de cor para status.
 
 ---
 
@@ -586,10 +586,10 @@ interface AuthenticatedActor {
 
 Sua finalidade é:
 
-* representar a identidade autenticada;
-* permitir guardrails;
-* servir de base para futuros use cases financeiros;
-* evitar dependência direta de payloads arbitrários.
+- representar a identidade autenticada;
+- permitir guardrails;
+- servir de base para futuros use cases financeiros;
+- evitar dependência direta de payloads arbitrários.
 
 Não criar abstrações de domínio financeiro ainda.
 
@@ -600,13 +600,13 @@ Não criar abstrações de domínio financeiro ainda.
 Futuros repositories privados deverão seguir semanticamente:
 
 ```ts
-findByIdForUser(resourceId, userId)
+findByIdForUser(resourceId, userId);
 ```
 
 em vez de:
 
 ```ts
-findById(resourceId)
+findById(resourceId);
 ```
 
 quando o recurso pertencer a um usuário.
@@ -619,13 +619,13 @@ O Ciclo 4 documenta e prepara essa fronteira, mas não cria tabelas financeiras 
 
 Obrigatório:
 
-* autorização no backend;
-* inputs validados;
-* secrets nunca retornados;
-* sessão derivada de cookie/header autenticado;
-* mutações administrativas não dependem apenas da UI;
-* sessões do alvo revogadas no bloqueio;
-* ações sobre usuário inexistente não geram comportamento ambíguo.
+- autorização no backend;
+- inputs validados;
+- secrets nunca retornados;
+- sessão derivada de cookie/header autenticado;
+- mutações administrativas não dependem apenas da UI;
+- sessões do alvo revogadas no bloqueio;
+- ações sobre usuário inexistente não geram comportamento ambíguo.
 
 ---
 
@@ -635,39 +635,39 @@ Obrigatório:
 
 Cobrir pelo menos:
 
-* GET users sem sessão → 401;
-* GET users como USER → 403;
-* GET users como ADMIN → 200;
-* contrato normalizado de usuário;
-* alteração de role como ADMIN;
-* USER não altera role;
-* role inválida;
-* usuário inexistente;
-* auto-rebaixamento bloqueado;
-* bloqueio por ADMIN;
-* USER não bloqueia;
-* bloqueio exige motivo;
-* auto-bloqueio bloqueado;
-* desbloqueio;
-* sessão invalidada após bloqueio;
-* usuário bloqueado não opera normalmente.
+- GET users sem sessão → 401;
+- GET users como USER → 403;
+- GET users como ADMIN → 200;
+- contrato normalizado de usuário;
+- alteração de role como ADMIN;
+- USER não altera role;
+- role inválida;
+- usuário inexistente;
+- auto-rebaixamento bloqueado;
+- bloqueio por ADMIN;
+- USER não bloqueia;
+- bloqueio exige motivo;
+- auto-bloqueio bloqueado;
+- desbloqueio;
+- sessão invalidada após bloqueio;
+- usuário bloqueado não opera normalmente.
 
 ### Web
 
 Cobrir:
 
-* USER continua sem acesso a `/app/admin`;
-* ADMIN acessa página;
-* loading;
-* listagem;
-* role/status visíveis;
-* alterar role;
-* confirmação;
-* bloquear;
-* desbloquear;
-* erro de API;
-* ações próprias indisponíveis;
-* responsividade estrutural quando viável.
+- USER continua sem acesso a `/app/admin`;
+- ADMIN acessa página;
+- loading;
+- listagem;
+- role/status visíveis;
+- alterar role;
+- confirmação;
+- bloquear;
+- desbloquear;
+- erro de API;
+- ações próprias indisponíveis;
+- responsividade estrutural quando viável.
 
 ---
 
@@ -700,16 +700,16 @@ O Ciclo 4 só termina quando:
 
 ## 28. Decisões consolidadas
 
-* Better Auth continua como sistema de autenticação;
-* não duplicar RBAC;
-* roles permanecem `user` e `admin`;
-* status público será `active` ou `blocked`;
-* bloqueio manual é permanente até desbloqueio;
-* motivo de bloqueio é obrigatório;
-* excluir usuário está fora de escopo;
-* ADMIN não acessa automaticamente dados financeiros alheios;
-* ADMIN não pode bloquear a própria conta;
-* ADMIN não pode remover o próprio papel;
-* backend é autoridade;
-* identidade futura dos use cases vem da sessão;
-* nenhuma tabela financeira será antecipada neste ciclo.
+- Better Auth continua como sistema de autenticação;
+- não duplicar RBAC;
+- roles permanecem `user` e `admin`;
+- status público será `active` ou `blocked`;
+- bloqueio manual é permanente até desbloqueio;
+- motivo de bloqueio é obrigatório;
+- excluir usuário está fora de escopo;
+- ADMIN não acessa automaticamente dados financeiros alheios;
+- ADMIN não pode bloquear a própria conta;
+- ADMIN não pode remover o próprio papel;
+- backend é autoridade;
+- identidade futura dos use cases vem da sessão;
+- nenhuma tabela financeira será antecipada neste ciclo.

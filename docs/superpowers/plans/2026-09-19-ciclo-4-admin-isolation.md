@@ -22,7 +22,7 @@ VERIFY
 
 REFACTOR
 → somente com testes verdes
-````
+```
 
 Para mudanças visuais:
 
@@ -71,9 +71,7 @@ Criar:
 ```ts
 export type UserRole = 'user' | 'admin';
 
-export type AdminUserStatus =
-  | 'active'
-  | 'blocked';
+export type AdminUserStatus = 'active' | 'blocked';
 
 export interface AdminUser {
   id: string;
@@ -162,15 +160,15 @@ apps/web/src/app/router/AppRouter.tsx
 
 A página deve:
 
-* consumir `GET /api/admin/users`;
-* renderizar dados reais;
-* identificar papel;
-* identificar status;
-* mostrar data de criação;
-* suportar loading;
-* suportar erro;
-* suportar lista vazia;
-* manter design ApexFinance.
+- consumir `GET /api/admin/users`;
+- renderizar dados reais;
+- identificar papel;
+- identificar status;
+- mostrar data de criação;
+- suportar loading;
+- suportar erro;
+- suportar lista vazia;
+- manter design ApexFinance.
 
 Nenhuma mutação ainda.
 
@@ -679,10 +677,10 @@ mobile
 
 Confirmar:
 
-* sem scroll horizontal indevido;
-* ações acessíveis;
-* lista legível;
-* drawer existente intacto.
+- sem scroll horizontal indevido;
+- ações acessíveis;
+- lista legível;
+- drawer existente intacto.
 
 ## Passo 12 — console
 
@@ -741,19 +739,3 @@ sessão
 → authenticated userId
 → use case
 → repository filtrado pelo proprietário
-
-Agora registre formalmente o começo do ciclo:
-
-```powershell
-git add `
-  "docs/superpowers/specs/2026-09-19-ciclo-4-admin-isolation.md" `
-  "docs/superpowers/plans/2026-09-19-ciclo-4-admin-isolation.md"
-
-git commit `
-  -m "docs: define arquitetura e plano do ciclo 4"
-
-git push -u origin feat/ciclo-4-admin-isolation
-
-git status --short
-git log -1 --oneline
-```
