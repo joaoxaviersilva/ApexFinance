@@ -1,14 +1,23 @@
-import type { AdminUser } from '@apexfinance/contracts';
+import type { AdminUser, UserRole } from '@apexfinance/contracts';
 import { useEffect, useMemo, useState } from 'react';
 
 import '../admin.css';
 
+import { authClient } from '../../../shared/lib/auth-client';
 import { AdminUserList } from '../components/AdminUserList';
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3333';
 
 type AdminUsersResponse = {
   users: AdminUser[];
+};
+
+type UpdateUserRoleResponse = {
+  user: AdminUser;
+};
+
+type ApiErrorResponse = {
+  error?: string;
 };
 
 type AdminPageState = 'loading' | 'success' | 'error';
@@ -22,9 +31,15 @@ function normalizeSearchValue(value: string) {
 }
 
 export function AdminPage() {
+  const { data: session } = authClient.useSession();
+
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [state, setState] = useState<AdminPageState>('loading');
   const [searchQuery, setSearchQuery] = useState('');
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
+
+  const currentUserId = session?.user.id;
 
   useEffect(() => {
     let isMounted = true;
@@ -93,6 +108,61 @@ export function AdminPage() {
   }, [searchQuery, users]);
 
   const hasSearch = searchQuery.trim().length > 0;
+
+  async function handleChangeRole(user: AdminUser, role: UserRole) {
+    const isSelfDemotion = user.id === currentUserId && user.role === 'admin' && role === 'user';
+
+    if (isSelfDemotion) {
+      return;
+    }
+
+    if (user.role === 'admin' && role === 'user') {
+      const confirmed = window.confirm(
+        `Deseja realmente remover o acesso administrativo de ${user.name}?`,
+      );
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    setMutationError(null);
+    setUpdatingUserId(user.id);
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/api/admin/users/${user.id}/role`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          role,
+        }),
+      });
+
+      if (!response.ok) {
+        const payload = (await response.json()) as ApiErrorResponse;
+
+        throw new Error(payload.error ?? 'Não foi possível alterar o papel.');
+      }
+
+      const payload = (await response.json()) as UpdateUserRoleResponse;
+
+      setUsers((currentUsers) =>
+        currentUsers.map((currentUser) =>
+          currentUser.id === payload.user.id ? payload.user : currentUser,
+        ),
+      );
+    } catch (error) {
+      setMutationError(
+        error instanceof Error ? error.message : 'Não foi possível alterar o papel.',
+      );
+    } finally {
+      setUpdatingUserId(null);
+    }
+  }
 
   return (
     <section className="admin-page" aria-labelledby="admin-page-title">
@@ -198,8 +268,20 @@ export function AdminPage() {
               </div>
             </header>
 
+            {mutationError && (
+              <div className="admin-users__mutation-error" role="alert">
+                <span aria-hidden="true">!</span>
+                <p>{mutationError}</p>
+              </div>
+            )}
+
             {filteredUsers.length > 0 ? (
-              <AdminUserList users={filteredUsers} />
+              <AdminUserList
+                users={filteredUsers}
+                currentUserId={currentUserId}
+                updatingUserId={updatingUserId}
+                onChangeRole={handleChangeRole}
+              />
             ) : (
               <div className="admin-users__search-empty" role="status">
                 <strong>Nenhum usuário corresponde à sua busca.</strong>
