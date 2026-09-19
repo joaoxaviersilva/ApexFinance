@@ -6,11 +6,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { buildApp } from '../../../app.js';
 import { prisma } from '../../../shared/infrastructure/database/prisma.js';
 
+const ADMIN_USER_KEYS = ['banReason', 'createdAt', 'email', 'id', 'name', 'role', 'status'];
+
 describe('GET /api/admin/users', () => {
   let app: FastifyInstance | undefined;
 
   afterEach(async () => {
     await app?.close();
+
     app = undefined;
   });
 
@@ -80,10 +83,11 @@ describe('GET /api/admin/users', () => {
     }
   });
 
-  it('retorna a lista de usuários para um administrador autenticado', async () => {
+  it('retorna usuários normalizados para um administrador autenticado', async () => {
     app = buildApp();
 
-    const email = `admin-${crypto.randomUUID()}@apexfinance.local`;
+    const adminEmail = `admin-${crypto.randomUUID()}@apexfinance.local`;
+    const blockedEmail = `bloqueado-${crypto.randomUUID()}@apexfinance.local`;
 
     try {
       const signUpResponse = await app.inject({
@@ -94,7 +98,7 @@ describe('GET /api/admin/users', () => {
         },
         payload: {
           name: 'Administrador de Teste',
-          email,
+          email: adminEmail,
           password: 'senha-segura-123',
         },
       });
@@ -111,10 +115,23 @@ describe('GET /api/admin/users', () => {
 
       const admin = await prisma.user.update({
         where: {
-          email,
+          email: adminEmail,
         },
         data: {
           role: 'admin',
+        },
+      });
+
+      const blockedUser = await prisma.user.create({
+        data: {
+          id: crypto.randomUUID(),
+          name: 'Usuário Bloqueado',
+          email: blockedEmail,
+          emailVerified: false,
+          role: null,
+          banned: true,
+          banReason: 'Teste administrativo',
+          banExpires: null,
         },
       });
 
@@ -128,20 +145,54 @@ describe('GET /api/admin/users', () => {
 
       expect(response.statusCode).toBe(200);
 
-      expect(response.json()).toEqual({
-        users: expect.arrayContaining([
-          expect.objectContaining({
-            id: admin.id,
-            name: 'Administrador de Teste',
-            email,
-            role: 'admin',
-          }),
-        ]),
+      const payload = response.json<{
+        users: Array<Record<string, unknown>>;
+      }>();
+
+      const returnedAdmin = payload.users.find((user) => user.id === admin.id);
+
+      const returnedBlockedUser = payload.users.find((user) => user.id === blockedUser.id);
+
+      expect(returnedAdmin).toBeDefined();
+      expect(returnedBlockedUser).toBeDefined();
+
+      expect(Object.keys(returnedAdmin!).sort()).toEqual(ADMIN_USER_KEYS);
+
+      expect(Object.keys(returnedBlockedUser!).sort()).toEqual(ADMIN_USER_KEYS);
+
+      expect(returnedAdmin).toEqual({
+        id: admin.id,
+        name: 'Administrador de Teste',
+        email: adminEmail,
+        role: 'admin',
+        status: 'active',
+        banReason: null,
+        createdAt: expect.any(String),
       });
+
+      expect(returnedBlockedUser).toEqual({
+        id: blockedUser.id,
+        name: 'Usuário Bloqueado',
+        email: blockedEmail,
+        role: 'user',
+        status: 'blocked',
+        banReason: 'Teste administrativo',
+        createdAt: expect.any(String),
+      });
+
+      expect(new Date(returnedAdmin!.createdAt as string).toISOString()).toBe(
+        returnedAdmin!.createdAt,
+      );
+
+      expect(new Date(returnedBlockedUser!.createdAt as string).toISOString()).toBe(
+        returnedBlockedUser!.createdAt,
+      );
     } finally {
       await prisma.user.deleteMany({
         where: {
-          email,
+          email: {
+            in: [adminEmail, blockedEmail],
+          },
         },
       });
     }

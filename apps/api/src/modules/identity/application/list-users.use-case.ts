@@ -1,19 +1,13 @@
-export interface AdminUserListItem {
-  id: string;
-  name: string;
-  email: string;
-  role: string | null;
-  createdAt: Date;
-}
+import type { AdminUser } from '@apexfinance/contracts';
 
 export interface UserRepository {
-  listUsers(): Promise<AdminUserListItem[]>;
+  listUsers(): Promise<AdminUser[]>;
 }
 
 export class ListUsersUseCase {
   constructor(private readonly userRepository: UserRepository) {}
 
-  async execute(): Promise<AdminUserListItem[]> {
+  async execute(): Promise<AdminUser[]> {
     return this.userRepository.listUsers();
   }
 }
