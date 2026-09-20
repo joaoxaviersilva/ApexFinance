@@ -2,6 +2,7 @@ import type { AdminUser, UserRole } from '@apexfinance/contracts';
 
 import type { UserRepository } from '../application/list-users.use-case.js';
 import type { UpdateUserRoleRepository } from '../application/update-user-role.use-case.js';
+import type { UpdateUserStatusRepository } from '../application/update-user-status.use-case.js';
 import { prisma } from '../../../shared/infrastructure/database/prisma.js';
 
 type PrismaAdminUser = {
@@ -13,6 +14,16 @@ type PrismaAdminUser = {
   banReason: string | null;
   createdAt: Date;
 };
+
+const adminUserSelect = {
+  id: true,
+  name: true,
+  email: true,
+  role: true,
+  banned: true,
+  banReason: true,
+  createdAt: true,
+} as const;
 
 function normalizeUserRole(role: string | null): UserRole {
   return role === 'admin' ? 'admin' : 'user';
@@ -30,18 +41,12 @@ function toAdminUser(user: PrismaAdminUser): AdminUser {
   };
 }
 
-export class PrismaUserRepository implements UserRepository, UpdateUserRoleRepository {
+export class PrismaUserRepository
+  implements UserRepository, UpdateUserRoleRepository, UpdateUserStatusRepository
+{
   async listUsers(): Promise<AdminUser[]> {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        banned: true,
-        banReason: true,
-        createdAt: true,
-      },
+      select: adminUserSelect,
       orderBy: {
         createdAt: 'asc',
       },
@@ -55,15 +60,7 @@ export class PrismaUserRepository implements UserRepository, UpdateUserRoleRepos
       where: {
         id: userId,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        banned: true,
-        banReason: true,
-        createdAt: true,
-      },
+      select: adminUserSelect,
     });
 
     if (!user) {
@@ -81,15 +78,49 @@ export class PrismaUserRepository implements UserRepository, UpdateUserRoleRepos
       data: {
         role,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        banned: true,
-        banReason: true,
-        createdAt: true,
+      select: adminUserSelect,
+    });
+
+    return toAdminUser(user);
+  }
+
+  async blockUser(userId: string, reason: string): Promise<AdminUser> {
+    const user = await prisma.$transaction(async (transaction) => {
+      const updatedUser = await transaction.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          banned: true,
+          banReason: reason,
+          banExpires: null,
+        },
+        select: adminUserSelect,
+      });
+
+      await transaction.session.deleteMany({
+        where: {
+          userId,
+        },
+      });
+
+      return updatedUser;
+    });
+
+    return toAdminUser(user);
+  }
+
+  async unblockUser(userId: string): Promise<AdminUser> {
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
       },
+      data: {
+        banned: false,
+        banReason: null,
+        banExpires: null,
+      },
+      select: adminUserSelect,
     });
 
     return toAdminUser(user);

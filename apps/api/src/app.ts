@@ -4,6 +4,7 @@ import Fastify from 'fastify';
 
 import { ListUsersUseCase } from './modules/identity/application/list-users.use-case.js';
 import { UpdateUserRoleUseCase } from './modules/identity/application/update-user-role.use-case.js';
+import { UpdateUserStatusUseCase } from './modules/identity/application/update-user-status.use-case.js';
 import { PrismaUserRepository } from './modules/identity/infrastructure/prisma-user.repository.js';
 import { registerAdminUsersRoute } from './modules/identity/presentation/admin-users.route.js';
 import { registerAuthRoutes } from './modules/identity/presentation/auth.route.js';
@@ -34,10 +35,12 @@ export function buildApp() {
 
   const updateUserRoleUseCase = new UpdateUserRoleUseCase(userRepository);
 
+  const updateUserStatusUseCase = new UpdateUserStatusUseCase(userRepository);
+
   registerAuthRoutes(app);
   registerMeRoute(app);
 
-  registerAdminUsersRoute(app, listUsersUseCase, updateUserRoleUseCase);
+  registerAdminUsersRoute(app, listUsersUseCase, updateUserRoleUseCase, updateUserStatusUseCase);
 
   return app;
 }
