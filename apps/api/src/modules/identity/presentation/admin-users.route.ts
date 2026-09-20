@@ -1,8 +1,8 @@
 import type { AdminUserStatus, UserRole } from '@apexfinance/contracts';
-import { fromNodeHeaders } from 'better-auth/node';
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 
+import { getAuthenticatedActor } from '../application/authenticated-actor.js';
 import type { ListUsersUseCase } from '../application/list-users.use-case.js';
 import {
   UpdateUserRoleError,
@@ -12,7 +12,6 @@ import {
   UpdateUserStatusError,
   type UpdateUserStatusUseCase,
 } from '../application/update-user-status.use-case.js';
-import { auth } from '../infrastructure/auth.js';
 import { requireAdmin } from './auth.guard.js';
 
 const userParamsSchema = z.object({
@@ -40,33 +39,6 @@ type UpdateUserStatusBody = {
   status: AdminUserStatus;
   reason?: string;
 };
-
-async function getAuthenticatedAdmin(request: FastifyRequest, reply: FastifyReply) {
-  const session = await auth.api.getSession({
-    headers: fromNodeHeaders(request.headers),
-  });
-
-  if (!session) {
-    await reply.status(401).send({
-      error: 'Não autenticado.',
-    });
-
-    return null;
-  }
-
-  if (session.user.role !== 'admin') {
-    await reply.status(403).send({
-      error: 'Acesso restrito a administradores.',
-    });
-
-    return null;
-  }
-
-  return {
-    userId: session.user.id,
-    role: 'admin' as const,
-  };
-}
 
 export function registerAdminUsersRoute(
   app: FastifyInstance,
@@ -115,11 +87,7 @@ export function registerAdminUsersRoute(
         });
       }
 
-      const actor = await getAuthenticatedAdmin(request, reply);
-
-      if (!actor) {
-        return;
-      }
+      const actor = getAuthenticatedActor(request);
 
       try {
         const user = await updateUserRoleUseCase.execute({
@@ -180,11 +148,7 @@ export function registerAdminUsersRoute(
         });
       }
 
-      const actor = await getAuthenticatedAdmin(request, reply);
-
-      if (!actor) {
-        return;
-      }
+      const actor = getAuthenticatedActor(request);
 
       try {
         const user = await updateUserStatusUseCase.execute({

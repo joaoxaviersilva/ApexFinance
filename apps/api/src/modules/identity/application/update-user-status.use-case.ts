@@ -1,9 +1,6 @@
-import type { AdminUser, AdminUserStatus, UserRole } from '@apexfinance/contracts';
+import type { AdminUser, AdminUserStatus } from '@apexfinance/contracts';
 
-export interface UpdateUserStatusActor {
-  userId: string;
-  role: UserRole;
-}
+import type { AuthenticatedActor } from './authenticated-actor.js';
 
 export interface UpdateUserStatusRepository {
   findById(userId: string): Promise<AdminUser | null>;
@@ -14,7 +11,7 @@ export interface UpdateUserStatusRepository {
 }
 
 export interface UpdateUserStatusInput {
-  actor: UpdateUserStatusActor;
+  actor: AuthenticatedActor;
   targetUserId: string;
   status: AdminUserStatus;
   reason?: string;
