@@ -12,20 +12,30 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CashAccountType {
+  GENERAL
+}
+
+enum CashMovementType {
+  DEPOSIT
+  WITHDRAWAL
+}
+
 model User {
-  id            String    @id
+  id            String        @id
   name          String
   email         String
-  emailVerified Boolean   @default(false)
+  emailVerified Boolean       @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   role          String?
-  banned        Boolean?  @default(false)
+  banned        Boolean?      @default(false)
   banReason     String?
   banExpires    DateTime?
   sessions      Session[]
   accounts      Account[]
+  cashAccounts  CashAccount[]
 
   @@unique([email])
   @@map("user")
@@ -78,4 +88,32 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model CashAccount {
+  id        String          @id @default(cuid())
+  userId    String
+  type      CashAccountType @default(GENERAL)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movements CashMovement[]
+
+  @@unique([userId, type])
+  @@index([userId])
+  @@map("cash_account")
+}
+
+model CashMovement {
+  id            String           @id @default(cuid())
+  cashAccountId String
+  type          CashMovementType
+  deltaCents    BigInt
+  description   String
+  occurredAt    DateTime
+  createdAt     DateTime         @default(now())
+  cashAccount   CashAccount      @relation(fields: [cashAccountId], references: [id], onDelete: Cascade)
+
+  @@index([cashAccountId, occurredAt(sort: Desc), createdAt(sort: Desc)])
+  @@map("cash_movement")
 }
