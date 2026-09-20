@@ -16,6 +16,8 @@ type LoginErrors = {
 export function LoginPage() {
   const navigate = useNavigate();
 
+  const { refetch: refetchSession } = authClient.useSession();
+
   const [errors, setErrors] = useState<LoginErrors>({});
 
   const [formError, setFormError] = useState<string | undefined>();
@@ -83,6 +85,8 @@ export function LoginPage() {
 
         return;
       }
+
+      await refetchSession();
 
       navigate('/app', {
         replace: true,
