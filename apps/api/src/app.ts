@@ -2,6 +2,10 @@ import type { HealthResponse } from '@apexfinance/contracts';
 import cors from '@fastify/cors';
 import Fastify from 'fastify';
 
+import { GetCashSummaryUseCase } from './modules/cash/application/get-cash-summary.use-case.js';
+import { ListCashMovementsUseCase } from './modules/cash/application/list-cash-movements.use-case.js';
+import { PrismaCashRepository } from './modules/cash/infrastructure/prisma-cash.repository.js';
+import { registerCashRoutes } from './modules/cash/presentation/cash.route.js';
 import { ListUsersUseCase } from './modules/identity/application/list-users.use-case.js';
 import { UpdateUserRoleUseCase } from './modules/identity/application/update-user-role.use-case.js';
 import { UpdateUserStatusUseCase } from './modules/identity/application/update-user-status.use-case.js';
@@ -37,10 +41,18 @@ export function buildApp() {
 
   const updateUserStatusUseCase = new UpdateUserStatusUseCase(userRepository);
 
+  const cashRepository = new PrismaCashRepository();
+
+  const getCashSummaryUseCase = new GetCashSummaryUseCase(cashRepository);
+
+  const listCashMovementsUseCase = new ListCashMovementsUseCase(cashRepository);
+
   registerAuthRoutes(app);
   registerMeRoute(app);
 
   registerAdminUsersRoute(app, listUsersUseCase, updateUserRoleUseCase, updateUserStatusUseCase);
+
+  registerCashRoutes(app, getCashSummaryUseCase, listCashMovementsUseCase);
 
   return app;
 }
