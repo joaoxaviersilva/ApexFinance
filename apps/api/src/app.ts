@@ -2,6 +2,7 @@ import type { HealthResponse } from '@apexfinance/contracts';
 import cors from '@fastify/cors';
 import Fastify from 'fastify';
 
+import { CreateCashMovementUseCase } from './modules/cash/application/create-cash-movement.use-case.js';
 import { GetCashSummaryUseCase } from './modules/cash/application/get-cash-summary.use-case.js';
 import { ListCashMovementsUseCase } from './modules/cash/application/list-cash-movements.use-case.js';
 import { PrismaCashRepository } from './modules/cash/infrastructure/prisma-cash.repository.js';
@@ -47,12 +48,20 @@ export function buildApp() {
 
   const listCashMovementsUseCase = new ListCashMovementsUseCase(cashRepository);
 
+  const createCashMovementUseCase = new CreateCashMovementUseCase(cashRepository);
+
   registerAuthRoutes(app);
+
   registerMeRoute(app);
 
   registerAdminUsersRoute(app, listUsersUseCase, updateUserRoleUseCase, updateUserStatusUseCase);
 
-  registerCashRoutes(app, getCashSummaryUseCase, listCashMovementsUseCase);
+  registerCashRoutes(
+    app,
+    getCashSummaryUseCase,
+    listCashMovementsUseCase,
+    createCashMovementUseCase,
+  );
 
   return app;
 }

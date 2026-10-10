@@ -13,18 +13,13 @@ vi.mock('../../../shared/infrastructure/database/prisma.js', () => ({
   prisma: {
     cashAccount: {
       findUnique: prismaMocks.cashAccountFindUnique,
-
       upsert: prismaMocks.cashAccountUpsert,
     },
-
     cashMovement: {
       aggregate: prismaMocks.cashMovementAggregate,
-
       create: prismaMocks.cashMovementCreate,
-
       findMany: prismaMocks.cashMovementFindMany,
     },
-
     $transaction: prismaMocks.transaction,
   },
 }));
@@ -32,7 +27,6 @@ vi.mock('../../../shared/infrastructure/database/prisma.js', () => ({
 import { PrismaCashRepository } from './prisma-cash.repository';
 
 const occurredAt = new Date('2026-09-19T18:00:00.000Z');
-
 const createdAt = new Date('2026-09-19T18:00:01.000Z');
 
 describe('PrismaCashRepository', () => {
@@ -50,8 +44,8 @@ describe('PrismaCashRepository', () => {
           cashAccount: {
             upsert: typeof prismaMocks.cashAccountUpsert;
           };
-
           cashMovement: {
+            aggregate: typeof prismaMocks.cashMovementAggregate;
             create: typeof prismaMocks.cashMovementCreate;
           };
         }) => Promise<unknown>,
@@ -60,8 +54,8 @@ describe('PrismaCashRepository', () => {
           cashAccount: {
             upsert: prismaMocks.cashAccountUpsert,
           },
-
           cashMovement: {
+            aggregate: prismaMocks.cashMovementAggregate,
             create: prismaMocks.cashMovementCreate,
           },
         }),
@@ -84,7 +78,6 @@ describe('PrismaCashRepository', () => {
           type: 'GENERAL',
         },
       },
-
       select: {
         id: true,
       },
@@ -96,6 +89,12 @@ describe('PrismaCashRepository', () => {
   it('cria automaticamente o caixa geral ao registrar o primeiro movimento', async () => {
     prismaMocks.cashAccountUpsert.mockResolvedValue({
       id: 'cash-account-1',
+    });
+
+    prismaMocks.cashMovementAggregate.mockResolvedValue({
+      _sum: {
+        deltaCents: null,
+      },
     });
 
     prismaMocks.cashMovementCreate.mockResolvedValue({
@@ -126,16 +125,22 @@ describe('PrismaCashRepository', () => {
           type: 'GENERAL',
         },
       },
-
       create: {
         userId: 'user-1',
         type: 'GENERAL',
       },
-
       update: {},
-
       select: {
         id: true,
+      },
+    });
+
+    expect(prismaMocks.cashMovementAggregate).toHaveBeenCalledWith({
+      where: {
+        cashAccountId: 'cash-account-1',
+      },
+      _sum: {
+        deltaCents: true,
       },
     });
 
@@ -147,7 +152,6 @@ describe('PrismaCashRepository', () => {
         description: 'Aporte inicial',
         occurredAt,
       },
-
       select: {
         id: true,
         type: true,
@@ -159,12 +163,15 @@ describe('PrismaCashRepository', () => {
     });
 
     expect(result).toEqual({
-      id: 'movement-1',
-      type: 'deposit',
-      amountCents: 100000,
-      description: 'Aporte inicial',
-      occurredAt: '2026-09-19T18:00:00.000Z',
-      createdAt: '2026-09-19T18:00:01.000Z',
+      movement: {
+        id: 'movement-1',
+        type: 'deposit',
+        amountCents: 100000,
+        description: 'Aporte inicial',
+        occurredAt: occurredAt.toISOString(),
+        createdAt: createdAt.toISOString(),
+      },
+      balanceCents: 100000,
     });
   });
 
@@ -192,7 +199,6 @@ describe('PrismaCashRepository', () => {
           type: 'GENERAL',
         },
       },
-
       select: {
         id: true,
       },
@@ -202,7 +208,6 @@ describe('PrismaCashRepository', () => {
       where: {
         cashAccountId: 'cash-account-user-1',
       },
-
       _sum: {
         deltaCents: true,
       },
@@ -223,7 +228,6 @@ describe('PrismaCashRepository', () => {
         occurredAt: new Date('2026-09-19T20:00:00.000Z'),
         createdAt: new Date('2026-09-19T20:00:01.000Z'),
       },
-
       {
         id: 'movement-1',
         type: 'DEPOSIT',
@@ -245,7 +249,6 @@ describe('PrismaCashRepository', () => {
           type: 'GENERAL',
         },
       },
-
       select: {
         id: true,
       },
@@ -255,7 +258,6 @@ describe('PrismaCashRepository', () => {
       where: {
         cashAccountId: 'cash-account-user-1',
       },
-
       select: {
         id: true,
         type: true,
@@ -264,7 +266,6 @@ describe('PrismaCashRepository', () => {
         occurredAt: true,
         createdAt: true,
       },
-
       orderBy: [
         {
           occurredAt: 'desc',
@@ -284,14 +285,13 @@ describe('PrismaCashRepository', () => {
         occurredAt: '2026-09-19T20:00:00.000Z',
         createdAt: '2026-09-19T20:00:01.000Z',
       },
-
       {
         id: 'movement-1',
         type: 'deposit',
         amountCents: 100000,
         description: 'Aporte inicial',
-        occurredAt: '2026-09-19T18:00:00.000Z',
-        createdAt: '2026-09-19T18:00:01.000Z',
+        occurredAt: occurredAt.toISOString(),
+        createdAt: createdAt.toISOString(),
       },
     ]);
   });

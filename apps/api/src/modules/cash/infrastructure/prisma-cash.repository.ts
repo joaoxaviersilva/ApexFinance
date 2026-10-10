@@ -1,5 +1,10 @@
-import type { CashMovement, CashMovementType } from '@apexfinance/contracts';
+import type {
+  CashMovement,
+  CashMovementType,
+  CreateCashMovementResponse,
+} from '@apexfinance/contracts';
 
+import { CashMovementError } from '../application/cash-movement.error.js';
 import { prisma } from '../../../shared/infrastructure/database/prisma.js';
 
 type PrismaCashMovement = {
@@ -18,6 +23,8 @@ type AppendMovementForUserInput = {
   description: string;
   occurredAt: Date;
 };
+
+const MAX_TRANSACTION_ATTEMPTS = 3;
 
 const cashMovementSelect = {
   id: true,
@@ -49,6 +56,14 @@ function toPublicMovement(movement: PrismaCashMovement): CashMovement {
   };
 }
 
+function isRetryablePrismaConflict(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null || !('code' in error)) {
+    return false;
+  }
+
+  return error.code === 'P2034' || error.code === 'P2002';
+}
+
 export class PrismaCashRepository {
   async getBalanceForUser(userId: string): Promise<number> {
     const account = await prisma.cashAccount.findUnique({
@@ -58,7 +73,6 @@ export class PrismaCashRepository {
           type: 'GENERAL',
         },
       },
-
       select: {
         id: true,
       },
@@ -72,7 +86,6 @@ export class PrismaCashRepository {
       where: {
         cashAccountId: account.id,
       },
-
       _sum: {
         deltaCents: true,
       },
@@ -89,7 +102,6 @@ export class PrismaCashRepository {
           type: 'GENERAL',
         },
       },
-
       select: {
         id: true,
       },
@@ -103,9 +115,7 @@ export class PrismaCashRepository {
       where: {
         cashAccountId: account.id,
       },
-
       select: cashMovementSelect,
-
       orderBy: [
         {
           occurredAt: 'desc',
@@ -119,45 +129,90 @@ export class PrismaCashRepository {
     return movements.map(toPublicMovement);
   }
 
-  async appendMovementForUser(input: AppendMovementForUserInput): Promise<CashMovement> {
-    const movement = await prisma.$transaction(async (transaction) => {
-      const account = await transaction.cashAccount.upsert({
-        where: {
-          userId_type: {
-            userId: input.userId,
-            type: 'GENERAL',
+  async appendMovementForUser(
+    input: AppendMovementForUserInput,
+  ): Promise<CreateCashMovementResponse> {
+    for (let attempt = 0; attempt < MAX_TRANSACTION_ATTEMPTS; attempt++) {
+      try {
+        return await prisma.$transaction(
+          async (transaction) => {
+            const account = await transaction.cashAccount.upsert({
+              where: {
+                userId_type: {
+                  userId: input.userId,
+                  type: 'GENERAL',
+                },
+              },
+              create: {
+                userId: input.userId,
+                type: 'GENERAL',
+              },
+              update: {},
+              select: {
+                id: true,
+              },
+            });
+
+            const aggregate = await transaction.cashMovement.aggregate({
+              where: {
+                cashAccountId: account.id,
+              },
+              _sum: {
+                deltaCents: true,
+              },
+            });
+
+            const currentBalanceCents = aggregate._sum.deltaCents ?? 0n;
+
+            const amountCents = BigInt(input.amountCents);
+
+            const deltaCents = input.type === 'deposit' ? amountCents : -amountCents;
+
+            const nextBalanceCents = currentBalanceCents + deltaCents;
+
+            if (nextBalanceCents < 0n) {
+              throw new CashMovementError(
+                'INSUFFICIENT_CASH_BALANCE',
+                'Saldo insuficiente para realizar esta saída.',
+              );
+            }
+
+            const safeBalanceCents = toSafeNumber(nextBalanceCents);
+
+            const movement = await transaction.cashMovement.create({
+              data: {
+                cashAccountId: account.id,
+                type: input.type === 'deposit' ? 'DEPOSIT' : 'WITHDRAWAL',
+                deltaCents,
+                description: input.description,
+                occurredAt: input.occurredAt,
+              },
+              select: cashMovementSelect,
+            });
+
+            return {
+              movement: toPublicMovement(movement),
+              balanceCents: safeBalanceCents,
+            };
           },
-        },
+          {
+            isolationLevel: 'Serializable',
+          },
+        );
+      } catch (error) {
+        if (!isRetryablePrismaConflict(error)) {
+          throw error;
+        }
 
-        create: {
-          userId: input.userId,
-          type: 'GENERAL',
-        },
+        if (attempt === MAX_TRANSACTION_ATTEMPTS - 1) {
+          throw new CashMovementError(
+            'CASH_CONCURRENCY_CONFLICT',
+            'Não foi possível concluir a movimentação devido a operações simultâneas. Tente novamente.',
+          );
+        }
+      }
+    }
 
-        update: {},
-
-        select: {
-          id: true,
-        },
-      });
-
-      const amountCents = BigInt(input.amountCents);
-
-      const deltaCents = input.type === 'deposit' ? amountCents : -amountCents;
-
-      return transaction.cashMovement.create({
-        data: {
-          cashAccountId: account.id,
-          type: input.type === 'deposit' ? 'DEPOSIT' : 'WITHDRAWAL',
-          deltaCents,
-          description: input.description,
-          occurredAt: input.occurredAt,
-        },
-
-        select: cashMovementSelect,
-      });
-    });
-
-    return toPublicMovement(movement);
+    throw new Error('Cash transaction finished without a result.');
   }
 }
