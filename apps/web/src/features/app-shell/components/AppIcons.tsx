@@ -1,5 +1,6 @@
 export type AppIconName =
   | 'dashboard'
+  | 'cash'
   | 'portfolio'
   | 'intelligence'
   | 'goals'
@@ -22,6 +23,14 @@ export function AppIcon({ name }: AppIconProps) {
           <rect x="14" y="3" width="7" height="7" rx="2" />
           <rect x="3" y="14" width="7" height="7" rx="2" />
           <rect x="14" y="14" width="7" height="7" rx="2" />
+        </>
+      )}
+
+      {name === 'cash' && (
+        <>
+          <rect x="3" y="6" width="18" height="13" rx="2" />
+          <path d="M3 10h18" />
+          <circle cx="12" cy="14.5" r="2" />
         </>
       )}
 
@@ -52,7 +61,7 @@ export function AppIcon({ name }: AppIconProps) {
       )}
 
       {name === 'fire' && (
-        <path d="M13.7 3.4c.6 3.1-.8 4.7-2.2 6.2-1.2 1.3-2.3 2.5-2.3 4.5 0 1.8 1.2 3.2 2.8 3.2 2.2 0 3.6-2 3.1-4.4 2 1.4 3.2 3.3 3.2 5.1A6.3 6.3 0 0 1 12 22a6.3 6.3 0 0 1-6.3-6.3c0-3.2 1.9-5.1 3.7-7 1.5-1.5 3-3 4.3-5.3Z" />
+        <path d="M13.7 3.4c.6 3.1-.8 4.7-2.2 6.2-1.2 1.3-2.3 2.5-2.3 4.5 0 1.8 1.2 2.8 3.2 2.2 0 3.6-2 3.1-4.4 2 1.4 3.2 3.3 3.2 5.1A6.3 6.3 0 0 1 12 22a6.3 6.3 0 0 1-6.3-6.3c0-3.2 1.9-5.1 3.7-7 1.5-1.5 3-3 4.3-5.3Z" />
       )}
 
       {name === 'factoring' && (

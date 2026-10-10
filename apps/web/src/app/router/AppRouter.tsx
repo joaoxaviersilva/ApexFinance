@@ -9,6 +9,7 @@ import { RequireAdmin } from '../../features/auth/components/RequireAdmin';
 import { RequireAuth } from '../../features/auth/components/RequireAuth';
 import { LoginPage } from '../../features/auth/pages/LoginPage';
 import { RegisterPage } from '../../features/auth/pages/RegisterPage';
+import { CashPage } from '../../features/cash/pages/CashPage';
 import { DashboardPage } from '../../features/dashboard/pages/DashboardPage';
 
 export function AppRouter() {
@@ -28,6 +29,8 @@ export function AppRouter() {
           }
         >
           <Route index element={<DashboardPage />} />
+
+          <Route path="cash" element={<CashPage />} />
 
           <Route
             path="portfolio"

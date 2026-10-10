@@ -1,0 +1,336 @@
+.cash-summary-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+
+  margin-top: 1.65rem;
+}
+
+.cash-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+
+  min-height: 2.85rem;
+  padding: 0.7rem 1.2rem;
+
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+
+  font-size: 0.79rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.cash-action-button:hover {
+  transform: translateY(-2px);
+}
+
+.cash-action-button:focus-visible,
+.cash-dialog button:focus-visible,
+.cash-dialog input:focus-visible {
+  outline: 2px solid var(--green-bright);
+  outline-offset: 3px;
+}
+
+.cash-action-button > span {
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.cash-action-button--deposit {
+  background: var(--green);
+  color: #03140b;
+}
+
+.cash-action-button--deposit:hover {
+  background: var(--green-bright);
+}
+
+.cash-action-button--withdrawal {
+  border-color: rgba(107, 255, 185, 0.18);
+
+  background: rgba(34, 229, 141, 0.045);
+  color: #c7e6d4;
+}
+
+.cash-action-button--withdrawal:hover {
+  border-color: rgba(107, 255, 185, 0.35);
+
+  background: rgba(34, 229, 141, 0.09);
+}
+
+.cash-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: grid;
+  place-items: center;
+
+  padding: 1.5rem;
+
+  overflow-y: auto;
+
+  background: rgba(0, 0, 0, 0.76);
+
+  backdrop-filter: blur(9px);
+}
+
+.cash-dialog {
+  position: relative;
+
+  width: min(100%, 31rem);
+  max-height: calc(100dvh - 3rem);
+
+  overflow-y: auto;
+
+  border: 1px solid rgba(107, 255, 185, 0.17);
+  border-radius: 1.15rem;
+
+  background:
+    radial-gradient(circle at 100% 0%, rgba(34, 229, 141, 0.09), transparent 65%),
+    linear-gradient(145deg, #0b1910, #040a06);
+
+  box-shadow:
+    0 35px 110px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.cash-dialog__form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 1.5rem;
+
+  padding: clamp(1.3rem, 4vw, 2rem);
+}
+
+.cash-dialog__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.cash-dialog__eyebrow {
+  color: #6e987f;
+
+  font-size: 0.59rem;
+  font-weight: 720;
+  letter-spacing: 0.17em;
+}
+
+.cash-dialog__header h2 {
+  margin: 0.3rem 0 0;
+
+  color: #f2fff7;
+
+  font-size: 1.5rem;
+  font-weight: 610;
+  letter-spacing: -0.045em;
+}
+
+.cash-dialog__header p {
+  margin: 0;
+
+  color: #839b8a;
+
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.cash-dialog__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.cash-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cash-dialog__field label {
+  color: #c5d9cb;
+
+  font-size: 0.75rem;
+  font-weight: 610;
+}
+
+.cash-dialog__field input {
+  width: 100%;
+  min-height: 3rem;
+
+  padding: 0.8rem 0.95rem;
+
+  border: 1px solid rgba(107, 255, 185, 0.15);
+  border-radius: 0.72rem;
+
+  background: rgba(2, 10, 5, 0.76);
+
+  color: #f0fff5;
+
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.cash-dialog__field input:hover {
+  border-color: rgba(107, 255, 185, 0.28);
+}
+
+.cash-dialog__field input:focus {
+  border-color: rgba(67, 246, 170, 0.55);
+
+  background: rgba(4, 17, 9, 0.9);
+}
+
+.cash-dialog__field input::placeholder {
+  color: #5c7464;
+}
+
+.cash-dialog__field input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.cash-dialog__field small {
+  color: #6f8978;
+
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+.cash-dialog__error {
+  margin: 0;
+
+  padding: 0.85rem 1rem;
+
+  border: 1px solid rgba(238, 133, 133, 0.2);
+  border-radius: 0.7rem;
+
+  background: rgba(202, 67, 67, 0.075);
+
+  color: #f1b2b2;
+
+  font-size: 0.77rem;
+  line-height: 1.6;
+}
+
+.cash-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+
+  margin-top: 0.3rem;
+  padding-top: 1.25rem;
+
+  border-top: 1px solid rgba(107, 255, 185, 0.085);
+}
+
+.cash-dialog__actions button {
+  min-height: 2.8rem;
+  padding: 0.7rem 1.15rem;
+
+  border: 1px solid transparent;
+  border-radius: 0.72rem;
+
+  font-size: 0.77rem;
+  font-weight: 650;
+
+  cursor: pointer;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease;
+}
+
+.cash-dialog__cancel {
+  border-color: rgba(107, 255, 185, 0.13) !important;
+
+  background: rgba(255, 255, 255, 0.035);
+  color: #b6c6bb;
+}
+
+.cash-dialog__cancel:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.cash-dialog__submit--deposit {
+  background: var(--green);
+  color: #021309;
+}
+
+.cash-dialog__submit--deposit:hover:not(:disabled) {
+  background: var(--green-bright);
+}
+
+.cash-dialog__submit--withdrawal {
+  border-color: rgba(67, 246, 170, 0.3) !important;
+
+  background: rgba(34, 229, 141, 0.12);
+  color: var(--green-soft);
+}
+
+.cash-dialog__submit--withdrawal:hover:not(:disabled) {
+  background: rgba(34, 229, 141, 0.2);
+}
+
+.cash-dialog__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 40rem) {
+  .cash-summary-card__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cash-action-button {
+    width: 100%;
+  }
+
+  .cash-dialog-backdrop {
+    align-items: center;
+    padding: 0.75rem;
+  }
+
+  .cash-dialog {
+    max-height: calc(100dvh - 1.5rem);
+  }
+
+  .cash-dialog__form {
+    padding: 1.3rem;
+  }
+
+  .cash-dialog__actions {
+    flex-direction: column-reverse;
+  }
+
+  .cash-dialog__actions button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cash-action-button,
+  .cash-dialog__field input,
+  .cash-dialog__actions button {
+    transition: none;
+  }
+}

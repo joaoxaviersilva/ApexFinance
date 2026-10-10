@@ -22,6 +22,11 @@ const primaryItems: NavigationItem[] = [
     end: true,
   },
   {
+    label: 'Caixa',
+    to: '/app/cash',
+    icon: 'cash',
+  },
+  {
     label: 'Carteira',
     to: '/app/portfolio',
     icon: 'portfolio',
