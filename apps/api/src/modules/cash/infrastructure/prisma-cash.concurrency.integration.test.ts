@@ -112,7 +112,7 @@ describe('PrismaCashRepository - concorrência real PostgreSQL', () => {
     const repository = new PrismaCashRepository();
     const occurredAt = new Date('2026-09-23T12:00:00.000Z');
 
-    const results = await Promise.all([
+    const [firstResult, secondResult] = await Promise.all([
       repository.appendMovementForUser({
         userId,
         type: 'deposit',
@@ -129,9 +129,24 @@ describe('PrismaCashRepository - concorrência real PostgreSQL', () => {
       }),
     ]);
 
-    expect(
-      results.map((result) => result.balanceCents).sort((first, second) => first - second),
-    ).toEqual([1_200, 3_200]);
+    expect(firstResult.movement).toMatchObject({
+      type: 'deposit',
+      amountCents: 1_200,
+      description: 'Primeiro depósito',
+    });
+
+    expect(secondResult.movement).toMatchObject({
+      type: 'deposit',
+      amountCents: 2_000,
+      description: 'Segundo depósito',
+    });
+
+    // O PostgreSQL pode concluir qualquer um dos dois depósitos primeiro.
+    // Ambas as sequências são válidas, desde que o saldo final seja 3.200.
+    expect([
+      [1_200, 3_200],
+      [3_200, 2_000],
+    ]).toContainEqual([firstResult.balanceCents, secondResult.balanceCents]);
 
     const accountCount = await prisma.cashAccount.count({
       where: {
@@ -153,5 +168,13 @@ describe('PrismaCashRepository - concorrência real PostgreSQL', () => {
     expect(
       movements.map((movement) => movement.amountCents).sort((first, second) => first - second),
     ).toEqual([1_200, 2_000]);
+
+    const ledgerBalance = movements.reduce(
+      (total, movement) =>
+        total + (movement.type === 'deposit' ? movement.amountCents : -movement.amountCents),
+      0,
+    );
+
+    expect(ledgerBalance).toBe(3_200);
   }, 20_000);
 });
